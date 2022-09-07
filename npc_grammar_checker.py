@@ -1,5 +1,7 @@
+from pydoc import doc
 import sys
 import graphviz
+
 
 class production_entry():
 
@@ -17,9 +19,11 @@ class production_entry():
     def check_ll_one(self) -> bool:
         for production in self.productions:
             for production2 in [x for x in self.productions if not x == production]:
-                factor = production_entry.longest_factor(production, production2)
+                factor = production_entry.longest_factor(
+                    production, production2)
                 #print("longest factor for" + " " + self.name + " " + str(factor) + " " + str(set(production[factor].first).union(production2[factor].first)))
-                print(self.name + " " + str(factor) + " " + str(len(production)) + " " + str(len(production2)))
+                print(self.name + " " + str(factor) + " " +
+                      str(len(production)) + " " + str(len(production2)))
                 if factor == len(production):
                     if not production2[factor].first.isdisjoint(self.follow):
                         return False
@@ -39,6 +43,7 @@ class production_entry():
                 return i
         return min([len(lst1), len(lst2)])
 
+    # Set first for this set of productions
     def set_first(self):
         if self.term:
             self.first = self.first.union(set([self]))
@@ -46,15 +51,20 @@ class production_entry():
             for production in self.productions:
                 self.first = self.first.union(production[0].set_first())
         return self.first
+
     def set_follow(self):
         for production in self.productions:
             for entry in range(len(production) - 1):
                 if not production[entry].term:
-                    production[entry].follow = production[entry].follow.union(production[entry + 1].first)
+                    production[entry].follow = production[entry].follow.union(
+                        production[entry + 1].first)
+
     def set_follow2(self):
         for production in self.productions:
             if not production[-1].term:
-                production[-1].follow = production[-1].follow.union(self.follow)
+                production[-1].follow = production[-1].follow.union(
+                    self.follow)
+
 
 class grammar():
     def __init__(self, file):
@@ -102,6 +112,7 @@ class grammar():
                     cur.productions.append(
                         [grammar.find_production(x, ret) for x in single_prod])
         return ret
+
     @staticmethod
     def find_production(name, productions) -> production_entry:
         for prod in productions:
@@ -127,12 +138,15 @@ class grammar():
         ret: str = ""
         ret += "####TERM####" + "\n"
         for production in filter(lambda x: x.term, self.productions):
-            ret += production.name + ":" + " " + production.productions[0][0][1:-1] + " " + "\n"
+            ret += production.name + ":" + " " + \
+                production.productions[0][0][1:-1] + " " + "\n"
         ret += "####PRODUCTIONS####" + "\n"
         for production in filter(lambda x: not x.term, self.productions):
             ret += production.name + ":" + " " + "\n"
-            ret += "FIRST:" + " " + str(list(map(lambda x: x.name, production.first))) + "\n"
-            ret += "FOLLOW:" + " " + str(list(map(lambda x: x.name, production.follow))) + "\n"
+            ret += "FIRST:" + " " + \
+                str(list(map(lambda x: x.name, production.first))) + "\n"
+            ret += "FOLLOW:" + " " + \
+                str(list(map(lambda x: x.name, production.follow))) + "\n"
             for single_production in production.productions:
                 ret += str([entry.name for entry in single_production]) + "\n"
         ret += str(self.verify())
