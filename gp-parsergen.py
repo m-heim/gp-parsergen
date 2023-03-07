@@ -1,15 +1,19 @@
 import sys
+import argparse
+
+
 def main():
-    pass
-# 2 PARAMETERS: 1. GRAMMER PATH 2. 
-def usage():
-    print("Usage: " + sys.argv[0] + " <grammar-file>")
-if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        usage()
-        sys.exit(1)
-    with open(sys.argv[1], "r") as f:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('file', action='store')
+    args = parser.parse_args()
+    with open(args.file, "r") as f:
         content = f.read()
     content_splitted = content.split("\n")
-    print("compiling to" + " " + content_splitted[0][1:] + " " + "grammar")
+    if content_splitted[0][0] != '!':
+        raise ValueError('No language specified')
+    language = content_splitted[0][1:]
+    print("compiling to" + " " + language + " " + "grammar")
+
+
+if __name__ == '__main__':
     main()
